@@ -35,7 +35,12 @@ module.exports = (sequelize) => {
     sprite: {
       type: DataTypes.STRING,
       validate: {isUrl: true},
-      defaultValue: "https://imagenpng.com/wp-content/uploads/2016/09/Pokebola-pokeball-png-0.png"
-    }// Aca recibe una imagen como parametro
+      defaultValue: "https://pm1.narvii.com/6444/b6bfb479b7bb9bb39b3f8ff18a30a2d68378d832_00.jpg"
+    },// Aca recibe una imagen como parametro
+    createdInDb: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
   });
 };
