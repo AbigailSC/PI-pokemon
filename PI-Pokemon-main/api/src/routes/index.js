@@ -132,18 +132,19 @@ router.post('/pokemons', async (req, res) => {
     }
 })
 
-router.get('/types', async (req, res) => {
+router.get('/types', async(req,res) =>{
     try{
-        let types = await Type.finnAll()
-        if (types.length > 0) return res.json(types)
-        let typesApi = await axios.get('https://pokeapi.co/api/v2/type')
-        typesApi = await Promise.all(typesApi.data.results.map(async (t) => {
-            let type = await Type.create({name: t.name})
-            return type
-        }))
-        return res.json(typesApi)
-    }catch(error){
-        return res.status(400).json('Ups! Algo ha salido mal')
+    let types = await Type.findAll();
+    if(types.length > 0) return res.json(types);
+    let typesApi = await axios.get('https://pokeapi.co/api/v2/type');
+    typesApi = await Promise.all(typesApi.data.results.map(async (tipo) => {
+        let typesP = await Type.create({name:tipo.name})
+        return typesP;
+    }));
+    console.log(typesApi);
+    return res.json(typesApi);
+    }catch(e){
+        return res.status(400).json('ups algo ha sucedido mal');
     }
 })
 module.exports = router;
