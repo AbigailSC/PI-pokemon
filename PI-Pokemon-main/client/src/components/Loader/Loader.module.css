@@ -1,0 +1,14 @@
+.conteiner{
+    display: grid;
+    place-items: center;
+    row-gap: 3rem;
+}
+.gif{
+    height: 10rem;
+}
+.text{
+    font-family: 'Press Start 2P';
+    text-transform: uppercase;
+    color:#fff003;
+    text-shadow:  0.1em 0.1em #747474;
+}
