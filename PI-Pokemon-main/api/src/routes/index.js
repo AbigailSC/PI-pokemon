@@ -57,19 +57,19 @@ router.get('/pokemons', async (req, res) => {
                 model: Type
             }})//Traemos el nombre del pokemon y su tipo que tenga el nombre pasado por query
             console.log(pokemonBd)
-            if(pokemon.data && pokemonBd.length > 0) {
+            if(pokemon.data && pokemonBd.length > 0) { //traemos los pokemons de la db y api
                 return res.json([objectPokemon(pokemon)].concat(pokemonBd))
             }
-            if(pokemonBd.length > 0) return res.json(pokemonBd);
-            if(pokemon.data) return res.json([objectPokemon(pokemon)]);
+            if(pokemonBd.length > 0) return res.json(pokemonBd);//traemos solo los pokemons de la db
+            if(pokemon.data) return res.json([objectPokemon(pokemon)]);//traemos solo pokemons de api
         }catch(error){
             let pokemonBd = await Pokemon.findAll({where:{name: name.toLowerCase()},include: {
                 model: Type
-            }})
+            }})//buscamos el pokemon en la base de datos
             if(pokemonBd.length > 0) return res.json(pokemonBd);
             else return res.send('nombre no encontrado');
         }
-    }else{
+    }else{//Si no traemos los 40 pokemons
         let pokemones =  await pokemonsApi();
         pokemones = pokemones.concat( await Pokemon.findAll({include: {
             model: Type
@@ -79,15 +79,15 @@ router.get('/pokemons', async (req, res) => {
 })
 
 router.get('/pokemons/:id',async (req,res) => {
-    const { id } = req.params;
+    const { id } = req.params; //scamos el id de url
     try{
         if(id){
             let idSearch = Number(id)
             console.log(idSearch)
-            if(Number.isInteger(idSearch)){
-                let callPokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
-                if(callPokemon.data) return res.json(objectPokemon(callPokemon))
-            }else{
+            if(Number.isInteger(idSearch)){ // si el id es entero
+                let callPokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)//hacemos la request a la api
+                if(callPokemon.data) return res.json(objectPokemon(callPokemon))//retornamos el json
+            }else{//si no hacemos la request en la db
                 let pokemonDb = await Pokemon.findByPk(id, {include: {
                     model: Type,
                 }})
@@ -103,15 +103,16 @@ router.get('/pokemons/:id',async (req,res) => {
 router.post('/pokemons', async (req, res) => {
     try{
         let {name, life, attack, defense, speed, height, weight, img, types} = req.body
-
-        let findPokemon = await Pokemon.findOne({where: { name: name.toLowerCase()}})// buscamos un poke en la db con el mismo name
-        if(findPokemon) return res.json({msg: 'El pokemon que intenta crear ya existe.'})
-        if(name&&life&&attack&&defense&&speed&&height&&weight&&img&&types){
-            if(Array.isArray(types)){
+        //recibimos del body todos estos datos
+        //let findPokemon = await Pokemon.findOne({where: { name: name.toLowerCase()}})// buscamos un poke en la db con el mismo name
+        //if(findPokemon) return res.json({msg: 'El pokemon que intenta crear ya existe.'})
+        if(name&&life&&attack&&defense&&speed&&height&&weight&&img&&types){ //preguntamos
+            if(Array.isArray(types)){//vemos si el types es un array
                 var typeDb = await Promise.all(types.map(async (tipo) => await Type.findAll({where: {name: tipo}})))
-                typeDb = typeDb.flat()
+                // mapeamos el types pasado por body para buscar los nombres del tipo en la base de datos
+                typeDb = typeDb.flat() //flat baja un nivel => [[2,3],["as", "dsa"]] => [2,3],["as","dsa"]
             }else{
-                var [typeDb, created] = await Type.findOrCreate({where: {name: types}})
+                var [typeDb, created] = await Type.findOrCreate({where: {name: types}})//si no creamos los tipos en la db
             }
             let insertPokemon = await Pokemon.create({
                 name: name.toLowerCase(),
